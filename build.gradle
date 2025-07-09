@@ -8,7 +8,7 @@ plugins {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
+	// Add repositories to retrieve artifacts from, here
 	mavenCentral()
 	flatDir {
 		dirs "libs"
@@ -25,6 +25,16 @@ repositories {
 		}
 		filter {
 			includeGroup "com.github.GTNewHorizons"
+		}
+	}
+	exclusiveContent {
+		forRepository {
+			maven {
+				url = "https://maven.crystaelix.com/releases/"
+			}
+		}
+		filter {
+			includeGroup "com.crystaelix"
 		}
 	}
 	exclusiveContent {
@@ -73,14 +83,14 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 loom {
-	// The log4j config file contained in this template is Minecraft default logging config, and does not contain debug information.
-	// Remove the following line and update the runtime log4j for Loom's default logging output.
+	// The log4j config file contained in this template is Minecraft default logging config, and does not contain debug information
+	// Remove the following line and update the runtime log4j for Loom's default logging output
 	log4jConfigs.setFrom "log4j2.xml"
 
 	silentMojangMappingsLicense()
 	legacyForge {
-		// Uncomment the following line for early mixin json configs.
-		//mixinConfig "${mod_id}.mixins.json"
+		// Specify early mixin json configs here, requires MixinConBooter
+		mixinConfig "${mod_id}.mixins.json"
 	}
 
 	mixin.defaultRefmapName = "${mod_id}.refmap.json"
@@ -100,17 +110,20 @@ loom {
 }
 
 dependencies {
-	// Uncomment the following line for Loom's default logging output.
+	// Uncomment the following line for Loom's default logging output
 	//implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
 
+	// Minecraft dependencies, required
 	minecraft "com.mojang:minecraft:1.7.10"
-	// While it is possible to use stable-12 mappings here, it is not recommended as most mods depends on Forge default mappings in a development environment.
+	// While it is possible to use stable-12 mappings here, it is not recommended as most mods depends on Forge default mappings in a development environment
 	mappings "net.minecraftforge:forge:${forge_version}:userdev"
 	legacyForge "net.minecraftforge:forge:${forge_version}:universal"
-
-	// Uncomment the following lines for mixins.
-	//implementation("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
-	//annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
+	
+	// Mixin dependencies, use if mixin is required
+	implementation("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
+	annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
+	// MixinConBooter is only needed if early mixins are required
+	implementation "com.crystaelix:mixinconbooter-legacy:${mixinconbooter_version}"
 
 	// Example dependencies
 	modImplementation("com.github.GTNewHorizons:CodeChickenLib:${ccl_version}") {transitive = false}
@@ -142,12 +155,6 @@ def manifestAttributes = [
 	"Implementation-Title": archivesBaseName,
 	"Implementation-Version": mod_version,
 	"Implementation-Vendor": mod_author,
-
-	// Uncomment the following lines for early mixin json configs.
-	//"TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-	//"TweakOrder": "0",
-	//"ForceLoadAsMod": "true",
-	//"FMLCorePluginContainsFMLMod": "true",
 ]
 
 jar {
@@ -158,7 +165,7 @@ sourcesJar {
 	manifest.attributes(manifestAttributes)
 }
 
-// Please refer to Mod Publish Plugin's documentation on how to use the plugin to upload projects to CurseForge/Modrinth.
+// Please refer to Mod Publish Plugin's documentation on how to use the plugin to upload projects to CurseForge/Modrinth
 publishMods {
 	file = remapJar.archiveFile
 	version = displayName = "1.7.10-${mod_version}"
@@ -166,4 +173,21 @@ publishMods {
 	type = ALPHA
 	modLoaders.add("forge")
 	additionalFiles.from(sourcesJar.archiveFile)
+
+	curseforge {
+		projectId = curseforge_project_id
+		accessToken = providers.gradleProperty("curseforge.token")
+		minecraftVersions.add("1.7.10")
+		// Mixin dependencies, use if mixin is required
+		// MixinConBooter is only needed if simple early mixins are required
+		requires "unimixins", "mixinconbooter"
+	}
+	modrinth {
+		projectId = modrinth_project_id
+		accessToken = providers.gradleProperty("modrinth.token")
+		minecraftVersions.add("1.7.10")
+		// Mixin dependencies, use if mixin is required
+		// MixinConBooter is only needed if simple early mixins are required
+		requires "unimixins", "mixinconbooter"
+	}
 }
