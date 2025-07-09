@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.example.examplemod.ExampleMod;
 
-import cpw.mods.fml.common.LoadController;
 import net.minecraft.init.Bootstrap;
 
 @Mixin(Bootstrap.class)
