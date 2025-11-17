@@ -116,10 +116,13 @@ dependencies {
 
 	// Minecraft dependencies, required
 	minecraft "com.mojang:minecraft:1.7.10"
-	// While it is possible to use stable-12 mappings here, it is not recommended as most mods depends on Forge default mappings in a development environment
-	mappings "net.minecraftforge:forge:${forge_version}:userdev"
+	// While it is possible to only use stable-12 mappings here, it is not recommended as most mods depends on Forge default mappings in a development environment
+	mappings loom.layered {
+		mcp "de.oceanlabs.mcp:mcp_stable:${mcp_version}"
+		mcp "net.minecraftforge:forge:${forge_version}:userdev"
+	}
 	legacyForge "net.minecraftforge:forge:${forge_version}:universal"
-	
+
 	// Mixin dependencies, use if mixin is required
 	implementation("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
 	annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:${unimixins_version}") {transitive = false}
